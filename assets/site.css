@@ -68,6 +68,9 @@ img { max-width: 100%; height: auto; }
   min-height: 4.5rem;
 }
 
+.masthead nav { display: flex; gap: 1.1rem; }
+.masthead nav a[aria-current="page"] { color: var(--accent); text-decoration: underline; text-underline-offset: .35em; }
+
 .brand {
   display: inline-flex;
   align-items: center;
@@ -183,6 +186,63 @@ img { max-width: 100%; height: auto; }
 
 .reports h2 { text-transform: uppercase; }
 
+.about-head {
+  color: var(--paper);
+  background: var(--ink);
+  border-top: 4px solid var(--signal);
+}
+
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr minmax(15rem, .62fr);
+  align-items: center;
+  gap: clamp(1.5rem, 6vw, 5rem);
+  padding-block: clamp(2.25rem, 6vw, 4.5rem);
+}
+
+.about-kicker {
+  margin: 0 0 .75rem;
+  color: var(--signal);
+  font: 600 .82rem/1.2 var(--display);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.about-head h1 {
+  margin: 0;
+  font: italic 700 clamp(3.4rem, 8vw, 6.5rem)/.9 var(--display);
+  letter-spacing: -.025em;
+  text-transform: uppercase;
+}
+
+.about-lede {
+  max-width: 34ch;
+  margin: 1.4rem 0 0;
+  color: #d2d1cc;
+  font-size: clamp(1.05rem, 2vw, 1.25rem);
+  line-height: 1.55;
+}
+
+.about-portrait {
+  width: min(100%, 22rem);
+  justify-self: end;
+  margin: 0;
+  padding: .45rem;
+  border: 1px solid #494b51;
+  background: #202226;
+  box-shadow: 0 .75rem 1.5rem #10111470;
+}
+
+.about-portrait img { display: block; width: 100%; }
+
+.about-portrait figcaption {
+  padding: .55rem .25rem .15rem;
+  color: #d2d1cc;
+  font-size: .72rem;
+}
+
+.about-prose { padding-top: clamp(2rem, 5vw, 3.5rem); }
+
 .entries { padding: 0; margin: 0; list-style: none; }
 .entries li { border-top: 1px solid var(--line); }
 .entries li:last-child { border-bottom: 1px solid var(--line); }
@@ -268,6 +328,9 @@ img { max-width: 100%; height: auto; }
   .hero h1 { width: min(100%, clamp(14rem, 57vw, 22rem)); }
   .badge-panel { min-height: 16rem; }
   .badge { width: min(70%, 14.5rem); }
+  .about-grid { grid-template-columns: 1fr; }
+  .about-portrait { justify-self: start; width: min(100%, 19rem); }
+  .masthead nav { gap: .75rem; }
   .entry { grid-template-columns: 1fr; }
   .entry p:last-child { grid-column: 1; }
 }

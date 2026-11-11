@@ -1,6 +1,6 @@
 # P-06 Field Journal
 
-A static blog for P-06 field reports. The build converts Markdown and LaTeX to HTML and MathML and bundles its styles and fonts with the output.
+A static blog for P-06 field reports and an About page. The build converts Markdown and LaTeX to HTML and MathML and bundles its styles, fonts, and profile portrait with the output.
 
 ## Build and preview
 
@@ -29,8 +29,16 @@ Start the report here. Use `$...$` for inline math and `$$` on separate lines ar
 
 Place shared images in `assets/` and link from a report with `![Description](../assets/example.svg)`.
 
+The site builds `about.md` as `about.html`. Design and emotion studies in `assets/references/` remain available in the public repository but are not copied into the Pages output.
+
 ## Publish
 
 In the GitHub repository, open **Settings → Pages** and select **GitHub Actions** as the source. Push to `main` or run **Deploy P-06 to GitHub Pages** from the Actions tab. The workflow builds and publishes `dist/`.
 
 To serve the site elsewhere, copy the contents of `dist/` to a static document directory. Links are relative, so the same output works at the domain root or below a path prefix.
+
+## Reuse
+
+The MIT License covers original website source code only, to the extent contributors hold rights they can license. It does not cover the generated portraits, fan-art references to existing characters, or separately licensed fonts and dependencies. See `about.md` for the attribution and copyright context.
+
+PNG assets use Git LFS. The Pages workflow checks out LFS objects before building the site.

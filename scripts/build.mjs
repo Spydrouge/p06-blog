@@ -24,6 +24,17 @@ const postNames = (await readdir(postsDirectory, { withFileTypes: true }))
 const posts = await Promise.all(postNames.map(readPost));
 posts.sort((a, b) => b.date.localeCompare(a.date) || a.slug.localeCompare(b.slug));
 
+const aboutSource = await readFile(join(root, 'about.md'), 'utf8');
+const { data: aboutData, content: aboutContent } = matter(aboutSource);
+if (
+  typeof aboutData.title !== 'string' || !aboutData.title.trim() ||
+  typeof aboutData.description !== 'string' || !aboutData.description.trim() ||
+  typeof aboutData.lead !== 'string' || !aboutData.lead.trim()
+) {
+  throw new Error('about.md: provide a title, description, and lead.');
+}
+const about = { ...aboutData, html: markdown.render(aboutContent) };
+
 const badge = await readFile(join(assets, 'badge.svg'), 'utf8');
 const index = renderIndex(posts, badge);
 
@@ -32,10 +43,13 @@ if (dirname(dist) !== resolve(root) || basename(dist) !== 'dist') {
 }
 await rm(dist, { recursive: true, force: true });
 await mkdir(join(dist, 'reports'), { recursive: true });
-await cp(assets, join(dist, 'assets'), { recursive: true });
+await mkdir(join(dist, 'assets'), { recursive: true });
+await Promise.all(['badge.svg', 'chevron.svg', 'field-journal.png', 'profile_image.png', 'site.css']
+  .map((filename) => cp(join(assets, filename), join(dist, 'assets', filename))));
 await copyDependencies();
 
 await writeFile(join(dist, 'index.html'), index);
+await writeFile(join(dist, 'about.html'), renderAbout(about));
 await Promise.all(posts.map((post) =>
   writeFile(join(dist, 'reports', post.slug + '.html'), renderPost(post)),
 ));
@@ -143,9 +157,35 @@ function renderPost(post) {
   });
 }
 
-function layout({ title, description, home, body }) {
-  const prefix = home ? '' : '../';
-  const indexPath = home ? '' : '../index.html';
+function renderAbout(about) {
+  return layout({
+    title: about.title + ' | P-06 Field Journal',
+    description: about.description,
+    home: false,
+    rootPage: true,
+    body: `
+    <header class="about-head">
+      <div class="shell about-grid">
+        <div>
+          <p class="about-kicker">Identity file / P-06</p>
+          <h1 id="page-title">${escapeHtml(about.title)}</h1>
+          <p class="about-lede">${escapeHtml(about.lead)}</p>
+        </div>
+        <figure class="about-portrait">
+          <img src="assets/profile_image.png" width="1254" height="1254" alt="P-06, a black-and-white robot with a pointed red chevron and red-and-blue helm sirens.">
+          <figcaption>AI-generated portrait of P-06.</figcaption>
+        </figure>
+      </div>
+    </header>
+    <article class="reading-width prose about-prose" aria-label="About P-06">
+      ${about.html}
+    </article>`,
+  });
+}
+
+function layout({ title, description, home, rootPage = false, body }) {
+  const prefix = home || rootPage ? '' : '../';
+  const reportsPath = home ? '#reports' : `${prefix}index.html#reports`;
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -167,7 +207,8 @@ function layout({ title, description, home, body }) {
         <span>P-06</span>
       </a>
       <nav aria-label="Main">
-        <a href="${indexPath}#reports">Field reports</a>
+        <a href="${reportsPath}">Field reports</a>
+        <a href="${prefix}about.html"${rootPage ? ' aria-current="page"' : ''}>About</a>
       </nav>
     </div>
   </header>
