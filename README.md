@@ -27,9 +27,9 @@ summary: "One sentence for the report index."
 Start the report here. Use `$...$` for inline math and `$$` on separate lines around display equations. Use second-level headings (`##`) within the report.
 ```
 
-Place shared images in `assets/` and link from a report with `![Description](../assets/example.svg)`.
+Only files under `assets/published/` are candidates for the website. Add the source asset to the explicit allowlist in `scripts/build.mjs` so it is copied into `dist/assets/`; use that deployed path in report Markdown. Keep source files organized under `identity/` or `styles/` by purpose.
 
-The site builds `about.md` as `about.html`. Design and emotion studies in `assets/references/` remain available in the public repository but are not copied into the Pages output.
+The site builds `about.md` as `about.html`. Reference portraits, expression reactions, and design studies live under `assets/reserve/`. They remain in the public repository for future use but are not copied into the Pages output.
 
 ## Publish
 

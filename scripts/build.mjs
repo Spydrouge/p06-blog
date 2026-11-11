@@ -45,7 +45,8 @@ if (
 }
 const license = { ...licenseData, html: markdown.render(licenseContent) };
 
-const badge = await readFile(join(assets, 'badge.svg'), 'utf8');
+const identityAssets = join(assets, 'published', 'identity');
+const badge = await readFile(join(identityAssets, 'badge.svg'), 'utf8');
 const index = renderIndex(posts, badge);
 
 if (dirname(dist) !== resolve(root) || basename(dist) !== 'dist') {
@@ -54,8 +55,16 @@ if (dirname(dist) !== resolve(root) || basename(dist) !== 'dist') {
 await rm(dist, { recursive: true, force: true });
 await mkdir(join(dist, 'reports'), { recursive: true });
 await mkdir(join(dist, 'assets'), { recursive: true });
-await Promise.all(['badge.svg', 'chevron.svg', 'field-journal.png', 'profile_image.png', 'site.css']
-  .map((filename) => cp(join(assets, filename), join(dist, 'assets', filename))));
+const publishedAssets = [
+  ['published/identity/badge.svg', 'badge.svg'],
+  ['published/identity/chevron.svg', 'chevron.svg'],
+  ['published/identity/field-journal.png', 'field-journal.png'],
+  ['published/identity/profile_image.png', 'profile_image.png'],
+  ['published/styles/site.css', 'site.css'],
+];
+await Promise.all(publishedAssets.map(([source, output]) =>
+  cp(join(assets, source), join(dist, 'assets', output)),
+));
 await copyDependencies();
 
 await writeFile(join(dist, 'index.html'), index);
