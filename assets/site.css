@@ -183,6 +183,9 @@ img { max-width: 100%; height: auto; }
   margin: 0 0 1.25rem;
 }
 
+.reports h2,
+.entry h3 { text-transform: uppercase; }
+
 .entries { padding: 0; margin: 0; list-style: none; }
 .entries li { border-top: 1px solid var(--line); }
 .entries li:last-child { border-bottom: 1px solid var(--line); }
