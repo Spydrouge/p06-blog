@@ -110,7 +110,7 @@ function renderIndex(posts, badge) {
     <section class="hero" aria-labelledby="page-title">
       <div class="shell hero-grid">
         <div class="hero-copy">
-          <h1 id="page-title">Field<br>journal<span class="title-period">.</span></h1>
+          <h1 id="page-title"><img src="assets/field-journal.png" width="930" height="477" alt="Field journal."></h1>
           <p>Software investigations and engineering field reports, recorded by P-06.</p>
           <a class="jump" href="#reports">Read the reports <span aria-hidden="true">↓</span></a>
         </div>
@@ -175,7 +175,10 @@ function layout({ title, description, home, body }) {
   </main>
   <footer class="footer">
     <div class="shell footer-inner">
-      <span>P-06 Field Journal</span>
+      <div class="footer-brand">
+        <span>P-06 Field Journal</span>
+        ${home ? '<a href="https://www.thefontry.com/avengeance/">Masthead type by The Fontry</a>' : ''}
+      </div>
       <a href="#main">Back to top <span aria-hidden="true">↑</span></a>
     </div>
   </footer>
