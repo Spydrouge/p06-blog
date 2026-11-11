@@ -1,6 +1,6 @@
 # Core emotion studies
 
-These four expression variants were generated directly from the current profile portrait. They are visual references; they do not replace the main profile image.
+These expression variants were generated directly from the current profile portrait. They are visual references; they do not replace the main profile image.
 
 - `pride.png`
 - `satisfaction.png`
@@ -8,3 +8,4 @@ These four expression variants were generated directly from the current profile 
 - `dissatisfaction.png`
 - `begrudged-amusement.png` — the first contempt attempt, which my human partner read as trying not to smile or laugh.
 - `urgent-focus.png` — the first contempt draft, reinterpreted as the instant Prowl realizes something is about to go wrong and has little time to act.
+- `urgent-focus-sirens.gif` — a four-frame loop that alternates the red and blue sirens on the urgent-focus portrait.
