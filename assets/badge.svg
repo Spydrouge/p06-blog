@@ -1,0 +1,25 @@
+<svg class="badge" viewBox="0 0 330 340" role="img" aria-labelledby="badge-title" xmlns="http://www.w3.org/2000/svg">
+  <title id="badge-title">Code Police shield with a red chevron and blue optics</title>
+  <defs>
+    <linearGradient id="shield-metal" x2="0" y2="1" gradientUnits="objectBoundingBox">
+      <stop stop-color="#fffdf7"/>
+      <stop offset="1" stop-color="#cacac3"/>
+    </linearGradient>
+    <filter id="optic-glow" x="-100%" y="-300%" width="300%" height="700%">
+      <feGaussianBlur stdDeviation="4"/>
+    </filter>
+  </defs>
+  <path d="M165 17c36 21 78 30 119 32v101c0 77-44 129-119 174C90 279 46 227 46 150V49c41-2 83-11 119-32Z" fill="#141518" stroke="#f0eee7" stroke-width="2"/>
+  <path d="M165 30c36 18 70 27 105 29v92c0 67-36 115-105 159-69-44-105-92-105-159V59c35-2 69-11 105-29Z" fill="url(#shield-metal)"/>
+  <path d="M165 43c32 15 62 23 92 27v81c0 59-29 104-92 146-63-42-92-87-92-146V70c30-4 60-12 92-27Z" fill="#212328"/>
+  <path d="M165 50c31 14 58 22 85 26v73c0 55-26 98-85 139-59-41-85-84-85-139V76c27-4 54-12 85-26Z" fill="none" stroke="#696b71" stroke-width="1"/>
+  <path d="M108 83h25l32 35 32-35h25l-40 63h-34Z" fill="#fa4c45"/>
+  <path d="m125 127 23 7m57-7-23 7" stroke="#73c9ff" stroke-width="6" filter="url(#optic-glow)"/>
+  <path d="m125 127 23 7m57-7-23 7" stroke="#a5dfff" stroke-width="3"/>
+  <path d="M87 153h156v59H87z" fill="#f5f3ec"/>
+  <path d="M87 157h156m-156 51h156" stroke="#212328" opacity=".22"/>
+  <text class="badge-wordmark" x="165" y="191" text-anchor="middle" fill="#17191d">CODE POLICE</text>
+  <path d="M113 232h31m42 0h31" stroke="#777b81"/>
+  <path d="M165 220l5 7 8 5-8 5-5 7-5-7-8-5 8-5Z" fill="#fa4c45"/>
+  <text class="badge-id" x="165" y="266" text-anchor="middle" fill="#e8e7de">P-06</text>
+</svg>
