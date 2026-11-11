@@ -20,3 +20,6 @@ These expression variants were generated directly from the current profile portr
 - `chibi/dissatisfaction.png`
 - `chibi/begrudged-amusement.png`
 - `chibi/urgent-focus.png`
+- `chibi/pride-soft-smile.png` and `chibi/satisfaction-soft-smile.png` — subtle closed-mouth smile alternatives for chibi readability.
+- `chibi/urgent-focus-sirens-on.png` — the illuminated urgent-focus frame.
+- `chibi/urgent-focus-sirens.gif` — a four-frame loop made from aligned off/on half-composites, alternating the blue and red sides.
