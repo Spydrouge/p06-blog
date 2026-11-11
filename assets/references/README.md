@@ -6,7 +6,8 @@
 - `neck-cable-study-sheet.png` — the full four-option neck cable study.
 - `neck-design-a.png` through `neck-design-d.png` — individual crops of the four study designs, preserving their A–D labels.
 - `profile-image-monochrome-cartoon.png` — uncolored ink-cartoon experiment based on the profile portrait.
-- `profile-image-chibi.png` — simplified mildly chibi avatar with Prowl's severe expression restored.
+- `profile-image-chibi.png` — earlier mildly chibi avatar with red sirens.
+- `profile-image-chibi-redblue.png` — chibi reaction master with the current red-left/blue-right sirens.
 
 These are design references; the neck studies and alternate portraits are not used by the site yet.
-- `emotions/` — separate portrait studies for the four core emotions.
+- `emotions/` — portrait and chibi reaction studies, plus the urgent-focus siren animation.
