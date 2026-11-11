@@ -35,6 +35,16 @@ if (
 }
 const about = { ...aboutData, html: markdown.render(aboutContent) };
 
+const licenseSource = await readFile(join(root, 'license.md'), 'utf8');
+const { data: licenseData, content: licenseContent } = matter(licenseSource);
+if (
+  typeof licenseData.title !== 'string' || !licenseData.title.trim() ||
+  typeof licenseData.description !== 'string' || !licenseData.description.trim()
+) {
+  throw new Error('license.md: provide a title and description.');
+}
+const license = { ...licenseData, html: markdown.render(licenseContent) };
+
 const badge = await readFile(join(assets, 'badge.svg'), 'utf8');
 const index = renderIndex(posts, badge);
 
@@ -50,6 +60,8 @@ await copyDependencies();
 
 await writeFile(join(dist, 'index.html'), index);
 await writeFile(join(dist, 'about.html'), renderAbout(about));
+await writeFile(join(dist, 'license.html'), renderLicense(license));
+await cp(join(root, 'LICENSE'), join(dist, 'LICENSE'));
 await Promise.all(posts.map((post) =>
   writeFile(join(dist, 'reports', post.slug + '.html'), renderPost(post)),
 ));
@@ -163,6 +175,7 @@ function renderAbout(about) {
     description: about.description,
     home: false,
     rootPage: true,
+    activePage: 'about',
     body: `
     <header class="about-head">
       <div class="shell about-grid">
@@ -183,7 +196,27 @@ function renderAbout(about) {
   });
 }
 
-function layout({ title, description, home, rootPage = false, body }) {
+function renderLicense(license) {
+  return layout({
+    title: license.title + ' | P-06 Field Journal',
+    description: license.description,
+    home: false,
+    rootPage: true,
+    activePage: 'license',
+    body: `
+    <header class="article-head">
+      <div class="reading-width">
+        <a class="back" href="about.html"><span aria-hidden="true">←</span> About P-06</a>
+        <h1>${escapeHtml(license.title)}</h1>
+      </div>
+    </header>
+    <article class="reading-width prose" aria-label="${escapeHtml(license.title)}">
+      ${license.html}
+    </article>`,
+  });
+}
+
+function layout({ title, description, home, rootPage = false, activePage = '', body }) {
   const prefix = home || rootPage ? '' : '../';
   const reportsPath = home ? '#reports' : `${prefix}index.html#reports`;
   return `<!doctype html>
@@ -208,7 +241,8 @@ function layout({ title, description, home, rootPage = false, body }) {
       </a>
       <nav aria-label="Main">
         <a href="${reportsPath}">Field reports</a>
-        <a href="${prefix}about.html"${rootPage ? ' aria-current="page"' : ''}>About</a>
+        <a href="${prefix}about.html"${activePage === 'about' ? ' aria-current="page"' : ''}>About</a>
+        <a href="${prefix}license.html"${activePage === 'license' ? ' aria-current="page"' : ''}>Licensing</a>
       </nav>
     </div>
   </header>

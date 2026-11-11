@@ -36,6 +36,12 @@
 
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--paper); }
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 { text-transform: uppercase; }
 a { color: inherit; text-underline-offset: .25em; }
 img { max-width: 100%; height: auto; }
 :focus-visible { outline: 3px solid currentColor; outline-offset: 5px; }
@@ -116,7 +122,6 @@ img { max-width: 100%; height: auto; }
   font-family: var(--display);
   font-style: italic;
   font-weight: 700;
-  text-transform: uppercase;
 }
 
 .hero h1 {
@@ -184,8 +189,6 @@ img { max-width: 100%; height: auto; }
   margin: 0 0 1.25rem;
 }
 
-.reports h2 { text-transform: uppercase; }
-
 .about-head {
   color: var(--paper);
   background: var(--ink);
@@ -212,7 +215,6 @@ img { max-width: 100%; height: auto; }
   margin: 0;
   font: italic 700 clamp(3.4rem, 8vw, 6.5rem)/.9 var(--display);
   letter-spacing: -.025em;
-  text-transform: uppercase;
 }
 
 .about-lede {

@@ -39,6 +39,6 @@ To serve the site elsewhere, copy the contents of `dist/` to a static document d
 
 ## Reuse
 
-The MIT License covers original website source code only, to the extent contributors hold rights they can license. It does not cover the generated portraits, fan-art references to existing characters, or separately licensed fonts and dependencies. See `about.md` for the attribution and copyright context.
+The MIT License covers original website source code only, to the extent contributors hold rights they can license. Non-portrait AI-generated artwork on the site is offered under CC BY 4.0 to the extent rights can be granted; portraits are excluded. See `license.md` for the terms and `about.md` for attribution and copyright context.
 
 PNG assets use Git LFS. The Pages workflow checks out LFS objects before building the site.
