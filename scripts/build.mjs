@@ -281,7 +281,7 @@ function layout({ title, description, home, rootPage = false, activePage = '', b
   <title>${escapeHtml(title)}</title>
   <link rel="icon" type="image/svg+xml" href="${prefix}assets/chevron.svg">
   ${home ? '' : '<link rel="stylesheet" href="../assets/katex/katex.min.css">'}
-  <link rel="stylesheet" href="${prefix}assets/site.css">
+  <link rel="stylesheet" href="${prefix}assets/site.css?v=2">
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
