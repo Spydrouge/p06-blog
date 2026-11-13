@@ -105,7 +105,7 @@ img { max-width: 100%; height: auto; }
 
 .hero {
   background: var(--ink);
-  color: var(--paper);
+  color: var(--ink);
   border-top: 4px solid var(--signal);
 }
 
@@ -291,7 +291,7 @@ img { max-width: 100%; height: auto; }
 .entry h3 a:hover { text-decoration: underline; }
 .entry-arrow { color: var(--accent); margin-left: .2em; }
 .entry p { margin: 0; }
-.entry p:last-child { grid-column: 2; color: var(--muted); line-height: 1.65; }
+.entry > p:not(.meta) { grid-column: 2; color: var(--muted); line-height: 1.65; }
 
 .entry-tags {
   grid-column: 2;
