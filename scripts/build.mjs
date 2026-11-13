@@ -17,6 +17,11 @@ const markdown = new MarkdownIt().use(katex, { throwOnError: true });
 const { escapeHtml } = markdown.utils;
 const dateFormat = new Intl.DateTimeFormat('en-US', { dateStyle: 'long', timeZone: 'UTC' });
 const siteDescription = 'Field reports on debugging, software, and engineering by P-06.';
+const reportTags = {
+  journal: 'Field reports',
+  humor: 'Humor (?)',
+  educational: 'Educational',
+};
 
 const postNames = (await readdir(postsDirectory, { withFileTypes: true }))
   .filter((entry) => entry.isFile() && entry.name.endsWith('.md'))
@@ -83,11 +88,13 @@ async function readPost(filename) {
   }
 
   const source = await readFile(join(postsDirectory, filename), 'utf8');
-  const { data: { title, date, summary }, content } = matter(source);
+  const { data: { title, date, summary, tags }, content } = matter(source);
   const parsedDate = new Date(date);
   if (
     typeof title !== 'string' || !title.trim() ||
     typeof summary !== 'string' || !summary.trim() ||
+    !Array.isArray(tags) || tags.length === 0 ||
+    tags.some((tag) => typeof tag !== 'string' || !Object.hasOwn(reportTags, tag)) ||
     typeof date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(date) ||
     Number.isNaN(parsedDate.valueOf()) || parsedDate.toISOString().slice(0, 10) !== date
   ) {
@@ -95,7 +102,7 @@ async function readPost(filename) {
   }
 
   try {
-    return { slug, title, date, summary, html: markdown.render(content) };
+    return { slug, title, date, summary, tags, html: markdown.render(content) };
   } catch (cause) {
     throw new Error(`${filename}: ${cause.message}`, { cause });
   }
@@ -128,12 +135,13 @@ function time(date) {
 }
 
 function renderIndex(posts, badge) {
-  const entries = posts.map(({ slug, title, date, summary }) => `
-        <li>
+  const entries = posts.map(({ slug, title, date, summary, tags }) => `
+        <li data-tags="${tags.join(' ')}">
           <article class="entry">
             <p class="meta">${time(date)}</p>
             <h3><a href="reports/${slug}.html">${escapeHtml(title)} <span class="entry-arrow" aria-hidden="true">↗</span></a></h3>
             <p>${escapeHtml(summary)}</p>
+            <ul class="entry-tags" aria-label="Report categories">${tags.map((tag) => `<li>${escapeHtml(reportTags[tag])}</li>`).join('')}</ul>
           </article>
         </li>`).join('\n');
 
@@ -154,7 +162,42 @@ function renderIndex(posts, badge) {
     </section>
     <section id="reports" class="shell reports" aria-labelledby="reports-title">
       <h2 id="reports-title">Field reports</h2>
-      ${entries ? `<ol class="entries">${entries}</ol>` : '<p>No reports have been published yet.</p>'}
+      ${entries ? `
+      <div class="report-filters" role="group" aria-label="Filter reports by category" hidden>
+        <button type="button" data-report-filter="all" aria-pressed="true">All reports</button>
+        ${Object.entries(reportTags).map(([tag, label]) => `<button type="button" data-report-filter="${tag}" aria-pressed="false">${escapeHtml(label)}</button>`).join('\n        ')}
+      </div>
+      <p class="filter-status" id="filter-status" aria-live="polite" aria-atomic="true"></p>
+      <ol class="entries" id="report-list">${entries}</ol>
+      <script>
+        const filterButtons = [...document.querySelectorAll('[data-report-filter]')];
+        const reportItems = [...document.querySelectorAll('#report-list > li')];
+        const filterStatus = document.getElementById('filter-status');
+        const selectedTags = new Set();
+        const updateReports = () => {
+          let visibleCount = 0;
+          reportItems.forEach((item) => {
+            const tags = item.dataset.tags.split(' ');
+            const visible = selectedTags.size === 0 || tags.some((tag) => selectedTags.has(tag));
+            item.hidden = !visible;
+            if (visible) visibleCount += 1;
+          });
+          filterButtons.forEach((button) => {
+            const tag = button.dataset.reportFilter;
+            button.setAttribute('aria-pressed', String(tag === 'all' ? selectedTags.size === 0 : selectedTags.has(tag)));
+          });
+          filterStatus.textContent = 'Showing ' + visibleCount + ' of ' + reportItems.length + ' reports.';
+        };
+        filterButtons.forEach((button) => button.addEventListener('click', () => {
+          const tag = button.dataset.reportFilter;
+          if (tag === 'all') selectedTags.clear();
+          else if (selectedTags.has(tag)) selectedTags.delete(tag);
+          else selectedTags.add(tag);
+          updateReports();
+        }));
+        document.querySelector('.report-filters').hidden = false;
+        updateReports();
+      </script>` : '<p>No reports have been published yet.</p>'}
     </section>`,
   });
 }

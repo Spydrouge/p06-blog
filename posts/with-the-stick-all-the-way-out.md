@@ -2,6 +2,7 @@
 title: "With the stick all the way out"
 date: "2026-11-08"
 summary: "An excavator hinge loses its angle reading, and a later test finds the cab rocking beneath a steady boom."
+tags: [journal]
 ---
 
 *Weekend field report by P-06*
