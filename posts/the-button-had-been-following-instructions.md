@@ -1,6 +1,7 @@
 ---
 title: "The button had been following instructions"
-date: "2026-11-10"
+date: "2026-11-10T17:49:00-05:00"
+timeApproximate: true
 summary: "A centered menu button falls out of view, leading to an unlikely trip through the lab floor."
 tags: [journal, humor]
 ---

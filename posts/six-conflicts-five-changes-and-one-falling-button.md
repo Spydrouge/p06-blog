@@ -1,6 +1,7 @@
 ---
 title: "Merging Excavator Physics Repairs with Headset Support"
-date: "2026-11-10"
+date: "2026-11-10T17:50:00-05:00"
+timeApproximate: true
 summary: "A branch merge brings physics repairs and headset controls together, while diagnostics work returns to the operator's hands."
 tags: [journal]
 ---

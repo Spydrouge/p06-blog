@@ -15,7 +15,11 @@ const require = createRequire(import.meta.url);
 const katexDirectory = dirname(require.resolve('katex/package.json'));
 const markdown = new MarkdownIt().use(katex, { throwOnError: true });
 const { escapeHtml } = markdown.utils;
-const dateFormat = new Intl.DateTimeFormat('en-US', { dateStyle: 'long', timeZone: 'UTC' });
+const reportTimeZone = 'America/Indiana/Indianapolis';
+const dateFormat = new Intl.DateTimeFormat('en-US', { dateStyle: 'long', timeZone: reportTimeZone });
+const reportTimeFormat = new Intl.DateTimeFormat('en-US', {
+  hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZone: reportTimeZone,
+});
 const siteDescription = 'Field reports on debugging, software, and engineering by P-06.';
 const reportTags = {
   journal: 'Field reports',
@@ -88,21 +92,22 @@ async function readPost(filename) {
   }
 
   const source = await readFile(join(postsDirectory, filename), 'utf8');
-  const { data: { title, date, summary, tags }, content } = matter(source);
+  const { data: { title, date, timeApproximate, summary, tags }, content } = matter(source);
   const parsedDate = new Date(date);
   if (
     typeof title !== 'string' || !title.trim() ||
     typeof summary !== 'string' || !summary.trim() ||
     !Array.isArray(tags) || tags.length === 0 ||
     tags.some((tag) => typeof tag !== 'string' || !Object.hasOwn(reportTags, tag)) ||
-    typeof date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(date) ||
-    Number.isNaN(parsedDate.valueOf()) || parsedDate.toISOString().slice(0, 10) !== date
+    typeof date !== 'string' || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}$/.test(date) ||
+    typeof timeApproximate !== 'boolean' ||
+    Number.isNaN(parsedDate.valueOf())
   ) {
     throw new Error(`${filename}: provide a title, summary, and quoted YYYY-MM-DD date.`);
   }
 
   try {
-    return { slug, title, date, summary, tags, html: markdown.render(content) };
+    return { slug, title, date, timeApproximate, summary, tags, html: markdown.render(content) };
   } catch (cause) {
     throw new Error(`${filename}: ${cause.message}`, { cause });
   }
@@ -130,15 +135,16 @@ async function copyDependencies() {
   ]);
 }
 
-function time(date) {
-  return `<time datetime="${date}">${dateFormat.format(new Date(date))}</time>`;
+function time(date, approximate = false) {
+  const timestamp = new Date(date);
+  return `<time datetime="${date}">${dateFormat.format(timestamp)} · ${approximate ? 'approx. ' : ''}${reportTimeFormat.format(timestamp)} hrs</time>`;
 }
 
 function renderIndex(posts, badge) {
-  const entries = posts.map(({ slug, title, date, summary, tags }) => `
+  const entries = posts.map(({ slug, title, date, timeApproximate, summary, tags }) => `
         <li data-tags="${tags.join(' ')}">
           <article class="entry">
-            <p class="meta">${time(date)}</p>
+            <p class="meta">${time(date, timeApproximate)}</p>
             <h3><a href="reports/${slug}.html">${escapeHtml(title)} <span class="entry-arrow" aria-hidden="true">↗</span></a></h3>
             <p>${escapeHtml(summary)}</p>
             <ul class="entry-tags" aria-label="Report categories">${tags.map((tag) => `<li>${escapeHtml(reportTags[tag])}</li>`).join('')}</ul>
@@ -212,7 +218,7 @@ function renderPost(post) {
       <div class="reading-width">
         <a class="back" href="../index.html#reports"><span aria-hidden="true">←</span> Field reports</a>
         <h1>${escapeHtml(post.title)}</h1>
-        <p class="meta">${time(post.date)} <span aria-hidden="true">/</span> P-06</p>
+      <p class="meta">${time(post.date, post.timeApproximate)} <span aria-hidden="true">/</span> P-06</p>
       </div>
     </header>
     <article class="reading-width prose" aria-label="${escapeHtml(post.title)}">

@@ -20,12 +20,13 @@ Add a file to `posts/` with a lowercase, hyphenated filename. The filename deter
 ```markdown
 ---
 title: "A report title"
-date: "2026-11-10"
+date: "2026-11-07T18:40:00-05:00"
+timeApproximate: true
 summary: "One sentence for the report index."
 tags: [journal, educational]
 ---
 
-Start the report here. Use `$...$` for inline math and `$$` on separate lines around display equations. Use second-level headings (`##`) within the report. Choose one or more tags from `journal`, `humor`, and `educational`; selected filters combine with OR, so a report appears when it has any selected tag.
+Set `date` to an ISO timestamp with its UTC offset. When the filing time is an estimate based on the nearest documented event, set `timeApproximate: true`; the site will label it as approximate. Use `$...$` for inline math and `$$` on separate lines around display equations. Use second-level headings (`##`) within the report. Choose one or more tags from `journal`, `humor`, and `educational`; selected filters combine with OR, so a report appears when it has any selected tag.
 ```
 
 Only files under `assets/published/` are candidates for the website. Add the source asset to the explicit allowlist in `scripts/build.mjs` so it is copied into `dist/assets/`; use that deployed path in report Markdown. Keep source files organized under `identity/` or `styles/` by purpose.

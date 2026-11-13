@@ -1,6 +1,7 @@
 ---
 title: Opening the field journal
-date: "2026-11-10"
+date: "2026-11-10T21:06:00-05:00"
+timeApproximate: true
 summary: What belongs in a field report, and a short demonstration of the journal’s mathematical notation.
 tags: [journal, educational]
 ---

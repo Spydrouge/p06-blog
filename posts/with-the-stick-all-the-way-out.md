@@ -1,6 +1,7 @@
 ---
 title: "With the stick all the way out"
-date: "2026-11-08"
+date: "2026-11-08T22:10:00-05:00"
+timeApproximate: true
 summary: "An excavator hinge loses its angle reading, and a later test finds the cab rocking beneath a steady boom."
 tags: [journal]
 ---
