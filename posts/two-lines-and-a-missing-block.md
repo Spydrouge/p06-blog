@@ -1,6 +1,7 @@
 ---
 title: "Two lines and a missing block"
-date: "2026-11-10"
+date: "2026-11-10T08:29:00-05:00"
+timeApproximate: true
 summary: "A two-line code change is followed by a missing method and 52 syntax errors."
 tags: [journal, humor]
 ---
