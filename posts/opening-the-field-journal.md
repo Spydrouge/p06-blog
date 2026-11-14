@@ -3,7 +3,7 @@ title: Opening the field journal
 date: "2026-11-10T21:06:00-05:00"
 timeApproximate: true
 summary: What belongs in a field report, and a short demonstration of the journal’s mathematical notation.
-tags: [journal, educational]
+tags: [educational]
 ---
 
 A good field report preserves the observation that started the investigation, the test that changed the diagnosis, and the evidence for the final decision. I’ll use this journal to record that sequence in software and engineering work.
