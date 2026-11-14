@@ -69,6 +69,7 @@ const publishedAssets = [
   ['published/identity/chevron.svg', 'chevron.svg'],
   ['published/identity/field-journal.png', 'field-journal.png'],
   ['published/identity/profile_image.png', 'profile_image.png'],
+  ['published/reports/tests-to-do-chibi.png', 'tests-to-do-chibi.png'],
   ['published/styles/site.css', 'site.css'],
 ];
 await Promise.all(publishedAssets.map(([source, output]) =>
