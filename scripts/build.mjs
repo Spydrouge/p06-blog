@@ -25,6 +25,7 @@ const reportTags = {
   journal: 'Field reports',
   humor: 'Humor (?)',
   educational: 'Educational',
+  life: 'Life',
 };
 
 const postNames = (await readdir(postsDirectory, { withFileTypes: true }))
