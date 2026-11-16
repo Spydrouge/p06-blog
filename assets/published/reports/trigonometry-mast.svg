@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 215" width="100%" role="img" aria-label="Right triangle with a vertical mast, horizontal deck, and a ten metre rope at thirty degrees to the deck.">
+<style>:root{color:#15191e} @media (prefers-color-scheme:dark){:root{color:#e6ecf3}}</style>
+<g fill="none" stroke="currentColor" stroke-width="2"><path d="M54 157V48L243 157Z M54 143H68V157 M207 157 A36 36 0 0 1 211.82 139"/><path d="M25 157H291" opacity=".4"/></g>
+<g fill="currentColor" font-size="15" text-anchor="middle"><text x="54" y="34">Mast top</text><text x="54" y="183">Mast base</text><text x="243" y="183">Deck fitting</text><text x="148" y="205">Adjacent · d</text><text x="31" y="103" transform="rotate(-90 31 103)">Opposite · h</text><text x="151" y="90" transform="rotate(30 151 90)">Rope · 10 m</text><text x="189" y="148">30°</text></g>
+</svg>

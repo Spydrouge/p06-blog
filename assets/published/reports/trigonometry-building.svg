@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 230" width="100%" role="img" aria-label="A right triangle connects your eyes, Friend A's eyes, and the roof. The horizontal leg is 20 metres, and the angle from your eyes to the roof is 30 degrees.">
+<style>:root{color:#15191e} @media (prefers-color-scheme:dark){:root{color:#e6ecf3}}</style>
+<g fill="none" stroke="currentColor" stroke-width="2">
+<path d="M38 168H258V41Z M243 168V153H258 M78 168 A40 40 0 0 0 72.64 148"/>
+<path d="M18 213H300 M258 168V213" opacity=".35"/>
+</g>
+<g fill="currentColor" font-size="15">
+<circle cx="38" cy="168" r="4"/><circle cx="258" cy="168" r="4"/><circle cx="258" cy="41" r="4"/>
+<text x="38" y="192" text-anchor="middle">P-06</text>
+<text x="258" y="192" text-anchor="middle">Friend A</text>
+<text x="258" y="26" text-anchor="middle">Roof</text>
+<text x="83" y="159">30°</text>
+<text x="146" y="191" text-anchor="middle">Adjacent · 20 m</text>
+<text x="280" y="107" text-anchor="middle" transform="rotate(-90 280 107)">Opposite · h</text>
+<text x="38" y="229">Ground level</text>
+<text x="136" y="93" text-anchor="middle" transform="rotate(-30 136 93)">Hypotenuse</text>
+</g>
+</svg>
