@@ -13,6 +13,22 @@ npm run build
 
 Open `dist/index.html` in a browser, or serve `dist/` with a static HTTP server.
 
+For the browser features, run `npm run preview` after building and open `http://127.0.0.1:4173/`. The preview serves only `dist/` and listens on the local machine. Set `PORT` to use a different port.
+
+## Reading desk
+
+The report index searches complete report text as well as titles and summaries. Category filters combine with OR; search terms must all appear. Readers can sort by newest, oldest, or shortest report. Search, filters, and order are represented in the URL; **Copy this view** makes a shareable link. A saved-only view uses the recipient's own reading list.
+
+**Save report** keeps a reading list in browser local storage. Report pages remember the furthest reading position, and an unfinished report appears under **Where you left off** on the index. The list and position stay in that browser; they do not sync between devices. If browser storage is unavailable, saving works for the current page visit. Section navigation and reading-time estimates are generated from the Markdown. Estimates use 220 words per minute and do not account for time spent studying equations.
+
+The full report list and content remain readable without JavaScript. If the full-text index fails to load, search falls back to the report index text. Clipboard failures reveal a selectable link instead.
+
+**Night reading** switches to a dark reading surface and remembers the choice in this browser. Print layouts use a light background and leave the reading controls out.
+
+Each report ends with up to three other reports, chosen by shared categories and then recency. These links and section contents work without JavaScript.
+
+`feed.xml` is an Atom feed with the complete published reports. Feed readers can discover it automatically or use the **Subscribe via Atom** footer link. Set `SITE_URL` when building for another host; its default is the journal's GitHub Pages address. Ordinary site navigation and assets continue to use relative paths.
+
 ## Write a report
 
 Add a file to `posts/` with a lowercase, hyphenated filename. The filename determines its URL. Each report starts with this front matter.

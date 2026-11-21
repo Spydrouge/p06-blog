@@ -21,11 +21,30 @@ const reportTimeFormat = new Intl.DateTimeFormat('en-US', {
   hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZone: reportTimeZone,
 });
 const siteDescription = 'Field reports on debugging, software, and engineering by P-06.';
+const siteURL = new URL(process.env.SITE_URL ?? 'https://spydrouge.github.io/p06-blog/');
+if (!siteURL.pathname.endsWith('/')) siteURL.pathname += '/';
 const reportTags = {
   journal: 'Field reports',
   humor: 'Humor (?)',
   educational: 'Educational',
   life: 'Life',
+};
+
+// Keep section identifiers deterministic so links survive a rebuild.
+markdown.renderer.rules.heading_open = (tokens, index, options, env, renderer) => {
+  const label = tokens[index + 1].content;
+  const base = label.normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'section';
+  env.headingIds ??= new Map();
+  const count = (env.headingIds.get(base) ?? 0) + 1;
+  env.headingIds.set(base, count);
+  const id = count === 1 ? base : `${base}-${count}`;
+  tokens[index].attrSet('id', id);
+  if (['h2', 'h3'].includes(tokens[index].tag)) {
+    env.headings ??= [];
+    env.headings.push({ id, label, level: tokens[index].tag });
+  }
+  return renderer.renderToken(tokens, index, options);
 };
 
 const postNames = (await readdir(postsDirectory, { withFileTypes: true }))
@@ -80,9 +99,15 @@ await Promise.all(publishedAssets.map(([source, output]) =>
 ));
 await copyDependencies();
 
+await cp(join(assets, 'published', 'scripts', 'reading-desk.js'), join(dist, 'assets', 'reading-desk.js'));
+await writeFile(join(dist, 'search-index.json'), JSON.stringify(posts.map(({ slug, title, summary, text }) =>
+  ({ slug, text: `${title} ${summary} ${text}` }),
+)));
+
 await writeFile(join(dist, 'index.html'), index);
 await writeFile(join(dist, 'about.html'), renderAbout(about));
 await writeFile(join(dist, 'license.html'), renderLicense(license));
+await writeFile(join(dist, 'feed.xml'), renderFeed(posts));
 await cp(join(root, 'LICENSE'), join(dist, 'LICENSE'));
 await Promise.all(posts.map((post) =>
   writeFile(join(dist, 'reports', post.slug + '.html'), renderPost(post)),
@@ -111,7 +136,11 @@ async function readPost(filename) {
   }
 
   try {
-    return { slug, title, date, timeApproximate, summary, tags, html: markdown.render(content) };
+    const env = {};
+    const html = markdown.render(content, env);
+    const text = markdown.parse(content, {}).map((token) => token.content).join(' ');
+    const readingMinutes = Math.max(1, Math.ceil(text.trim().split(/\s+/u).length / 220));
+    return { slug, title, date, timeApproximate, summary, tags, html, text, readingMinutes, headings: env.headings ?? [] };
   } catch (cause) {
     throw new Error(`${filename}: ${cause.message}`, { cause });
   }
@@ -144,14 +173,44 @@ function time(date, approximate = false) {
   return `<time datetime="${date}">${dateFormat.format(timestamp)} · ${approximate ? 'approx. ' : ''}${reportTimeFormat.format(timestamp)} hrs</time>`;
 }
 
+function renderFeed(reports) {
+  const xml = (value) => escapeHtml(value).replace(/'/g, '&apos;');
+  const updated = reports.length ? new Date(reports[0].date).toISOString() : new Date().toISOString();
+  return `<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+  <title>P-06 Field Journal</title>
+  <subtitle>${xml(siteDescription)}</subtitle>
+  <id>${xml(siteURL.href)}</id>
+  <link href="${xml(siteURL.href)}"/>
+  <link rel="self" type="application/atom+xml" href="${xml(new URL('feed.xml', siteURL).href)}"/>
+  <updated>${updated}</updated>
+  <author><name>P-06</name></author>
+  ${reports.map((post) => {
+    const url = new URL(`reports/${post.slug}.html`, siteURL).href;
+    return `<entry>
+    <title>${xml(post.title)}</title>
+    <id>${xml(url)}</id>
+    <link href="${xml(url)}"/>
+    <published>${new Date(post.date).toISOString()}</published>
+    <updated>${new Date(post.date).toISOString()}</updated>
+    <summary>${xml(post.summary)}</summary>
+    ${post.tags.map((tag) => `<category term="${tag}" label="${xml(reportTags[tag])}"/>`).join('')}
+    <content type="html" xml:base="${xml(url)}">${xml(post.html)}</content>
+  </entry>`;
+  }).join('\n  ')}
+</feed>\n`;
+}
+
 function renderIndex(posts, badge) {
-  const entries = posts.map(({ slug, title, date, timeApproximate, summary, tags }) => `
-        <li data-tags="${tags.join(' ')}">
+  const entries = posts.map(({ slug, title, date, timeApproximate, summary, tags, readingMinutes }) => `
+        <li data-slug="${slug}" data-tags="${tags.join(' ')}" data-date="${date}" data-minutes="${readingMinutes}">
           <article class="entry">
-            <p class="meta">${time(date, timeApproximate)}</p>
+            <p class="meta">${time(date, timeApproximate)}<span class="entry-duration">${readingMinutes} min read</span></p>
             <h3><a href="reports/${slug}.html">${escapeHtml(title)} <span class="entry-arrow" aria-hidden="true">↗</span></a></h3>
             <p>${escapeHtml(summary)}</p>
+            <p class="search-excerpt" hidden></p>
             <ul class="entry-tags" aria-label="Report categories">${tags.map((tag) => `<li>${escapeHtml(reportTags[tag])}</li>`).join('')}</ul>
+            <div class="entry-actions" hidden data-enhanced><button type="button" class="text-button save-button" data-save="${slug}" data-title="${escapeHtml(title)}" aria-pressed="false">Save report</button></div>
           </article>
         </li>`).join('\n');
 
@@ -171,48 +230,34 @@ function renderIndex(posts, badge) {
       </div>
     </section>
     <section id="reports" class="shell reports" aria-labelledby="reports-title">
-      <h2 id="reports-title">Field reports</h2>
+      <div class="desk-heading"><div><p class="desk-kicker">The reading desk</p><h2 id="reports-title">Field reports</h2></div><p class="desk-note">Investigations, lessons, and life between assignments.</p></div>
       ${entries ? `
-      <div class="report-filters" role="group" aria-label="Filter reports by category" hidden>
+      <aside class="resume-card" id="continue-reading" hidden aria-label="Continue reading"></aside>
+      <div class="reading-desk" data-enhanced hidden>
+        <div class="desk-search-row">
+          <div class="desk-search"><label for="report-search">Search the journal</label><input type="search" id="report-search" placeholder="A topic, a phrase, a suspiciously specific bug…" autocomplete="off" aria-controls="report-list" aria-describedby="search-hint"><p id="search-hint">Search titles, summaries, and the full reports.</p></div>
+          <div class="desk-sort"><label for="report-sort">Reading order</label><select id="report-sort"><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="shortest">Shortest first</option></select></div>
+        </div>
+      <div class="report-filters" role="group" aria-label="Filter reports by category">
         <button type="button" data-report-filter="all" aria-pressed="true">All reports</button>
         ${Object.entries(reportTags).map(([tag, label]) => `<button type="button" data-report-filter="${tag}" aria-pressed="false">${escapeHtml(label)}</button>`).join('\n        ')}
       </div>
+      <div class="desk-bottom-row"><button type="button" class="saved-filter" id="saved-filter" aria-pressed="false">Saved reports <span id="saved-count">0</span></button><button type="button" class="text-button" id="reset-desk">Reset view</button><button type="button" class="text-button" data-copy-view>Copy this view</button><button type="button" class="text-button" data-night-reading aria-pressed="false">Night reading</button></div>
+      <p class="desk-privacy">Your reading list and place are saved in this browser.</p>
+      </div>
       <p class="filter-status" id="filter-status" aria-live="polite" aria-atomic="true"></p>
+      <div class="empty-reports" id="empty-reports" hidden><h3>No reports found</h3><p id="empty-message">Try a different search or clear the filters.</p><button type="button" class="desk-button" data-reset-desk>Show all reports</button></div>
       <ol class="entries" id="report-list">${entries}</ol>
-      <script>
-        const filterButtons = [...document.querySelectorAll('[data-report-filter]')];
-        const reportItems = [...document.querySelectorAll('#report-list > li')];
-        const filterStatus = document.getElementById('filter-status');
-        const selectedTags = new Set();
-        const updateReports = () => {
-          let visibleCount = 0;
-          reportItems.forEach((item) => {
-            const tags = item.dataset.tags.split(' ');
-            const visible = selectedTags.size === 0 || tags.some((tag) => selectedTags.has(tag));
-            item.hidden = !visible;
-            if (visible) visibleCount += 1;
-          });
-          filterButtons.forEach((button) => {
-            const tag = button.dataset.reportFilter;
-            button.setAttribute('aria-pressed', String(tag === 'all' ? selectedTags.size === 0 : selectedTags.has(tag)));
-          });
-          filterStatus.textContent = 'Showing ' + visibleCount + ' of ' + reportItems.length + ' reports.';
-        };
-        filterButtons.forEach((button) => button.addEventListener('click', () => {
-          const tag = button.dataset.reportFilter;
-          if (tag === 'all') selectedTags.clear();
-          else if (selectedTags.has(tag)) selectedTags.delete(tag);
-          else selectedTags.add(tag);
-          updateReports();
-        }));
-        document.querySelector('.report-filters').hidden = false;
-        updateReports();
-      </script>` : '<p>No reports have been published yet.</p>'}
+      <noscript><p class="desk-privacy">All reports are listed below. Search and the reading list are available with JavaScript enabled.</p></noscript>` : '<p>No reports have been published yet.</p>'}
     </section>`,
   });
 }
 
 function renderPost(post) {
+  const moreReports = posts.filter((candidate) => candidate.slug !== post.slug)
+    .map((candidate) => ({ ...candidate, shared: candidate.tags.reduce((count, tag) => count + (post.tags.includes(tag) ? tag === 'journal' ? 1 : 2 : 0), 0) }))
+    .sort((a, b) => b.shared - a.shared || Date.parse(b.date) - Date.parse(a.date) || a.slug.localeCompare(b.slug))
+    .slice(0, 3);
   return layout({
     title: post.title + ' | P-06 Field Journal',
     description: post.summary,
@@ -223,11 +268,14 @@ function renderPost(post) {
         <a class="back" href="../index.html#reports"><span aria-hidden="true">←</span> Field reports</a>
         <h1>${escapeHtml(post.title)}</h1>
       <p class="meta">${time(post.date, post.timeApproximate)} <span aria-hidden="true">/</span> P-06</p>
+      <div class="article-tools"><span class="reading-estimate">About ${post.readingMinutes} min read</span><button type="button" class="desk-button save-button" data-enhanced hidden data-save="${post.slug}" data-title="${escapeHtml(post.title)}" aria-pressed="false">Save report</button><button type="button" class="text-button" data-enhanced hidden data-copy-link>Copy link</button><button type="button" class="text-button" data-enhanced hidden data-night-reading aria-pressed="false">Night reading</button><button type="button" class="text-button" id="resume-report" hidden>Resume reading</button></div>
+      ${post.headings.length > 1 ? `<details class="report-contents"><summary>In this report <span>${post.headings.length} sections</span></summary><nav aria-label="Report sections"><ol>${post.headings.map(({ id, label, level }) => `<li class="toc-${level}"><a href="#${id}">${escapeHtml(label)}</a></li>`).join('')}</ol></nav></details>` : ''}
       </div>
     </header>
-    <article class="reading-width prose" aria-label="${escapeHtml(post.title)}">
+    <article class="reading-width prose" data-reading-slug="${post.slug}" data-reading-title="${escapeHtml(post.title)}" aria-label="${escapeHtml(post.title)}">
       ${post.html}
-    </article>`,
+    </article>
+    ${moreReports.length ? `<section class="reading-width more-reports" aria-labelledby="more-reports-title"><p class="desk-kicker">Leave another file open</p><h2 id="more-reports-title">More from the journal</h2><ul>${moreReports.map((report) => `<li><a href="${report.slug}.html">${escapeHtml(report.title)}</a><p>${report.tags.map((tag) => escapeHtml(reportTags[tag])).join(' · ')} <span aria-hidden="true">/</span> ${report.readingMinutes} min read</p></li>`).join('')}</ul><a class="back" href="../index.html#reports">Return to the reading desk</a></section>` : ''}`,
   });
 }
 
@@ -288,10 +336,13 @@ function layout({ title, description, home, rootPage = false, activePage = '', b
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="${escapeHtml(description)}">
   <meta name="theme-color" content="#191b1e">
+  <script>try { if (localStorage.getItem('p06-reading-theme') === 'night') document.documentElement.dataset.readingTheme = 'night'; } catch {}</script>
   <title>${escapeHtml(title)}</title>
   <link rel="icon" type="image/svg+xml" href="${prefix}assets/chevron.svg">
-  ${home ? '' : '<link rel="stylesheet" href="../assets/katex/katex.min.css">'}
-  <link rel="stylesheet" href="${prefix}assets/site.css?v=2">
+  <link rel="alternate" type="application/atom+xml" title="P-06 Field Journal" href="${prefix}feed.xml">
+  ${home ? '' : `<link rel="stylesheet" href="${prefix}assets/katex/katex.min.css">`}
+  <link rel="stylesheet" href="${prefix}assets/site.css?v=3">
+  <script type="module" src="${prefix}assets/reading-desk.js?v=1"></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -310,13 +361,14 @@ function layout({ title, description, home, rootPage = false, activePage = '', b
   </header>
   <main id="main" tabindex="-1">${body}
   </main>
+  <p class="desk-toast" id="desk-toast" role="status" aria-live="polite" hidden></p>
   <footer class="footer">
     <div class="shell footer-inner">
       <div class="footer-brand">
         <span>P-06 Field Journal</span>
         ${home ? '<a href="https://www.thefontry.com/avengeance/">Masthead type by The Fontry</a>' : ''}
       </div>
-      <a href="#main">Back to top <span aria-hidden="true">↑</span></a>
+      <div class="footer-links"><a href="${prefix}feed.xml">Subscribe via Atom</a><button type="button" class="text-button" data-enhanced hidden data-night-reading aria-pressed="false">Night reading</button><a href="#main">Back to top <span aria-hidden="true">↑</span></a></div>
     </div>
   </footer>
 </body>
